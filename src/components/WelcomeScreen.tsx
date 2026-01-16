@@ -25,7 +25,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart }) => {
                     justifyContent: 'center',
                     marginBottom: '2rem'
                 }}>
-                    <img src="/cch-logo.png" alt="Institution Logo" style={{ maxWidth: '180px', height: 'auto' }} />
+                    <img src={`${import.meta.env.BASE_URL}cch-logo.png`} alt="Institution Logo" style={{ maxWidth: '180px', height: 'auto' }} />
                 </div>
 
                 <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>腹膜透析<br />知識技術學習成效評估</h1>
