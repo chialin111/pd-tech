@@ -114,7 +114,8 @@ const mockQuestions = (): Question[] => {
         });
     }
 
-    return questions;
+    // Randomly select 5 questions
+    return questions.sort(() => 0.5 - Math.random()).slice(0, 5);
 };
 
 const mockSubmit = (_name: string, responses: UserResponse[]): Promise<QuizResult> => {

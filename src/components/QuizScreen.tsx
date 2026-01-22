@@ -10,7 +10,7 @@ interface QuizScreenProps {
 
 export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isSubmitting }) => {
     console.log('QuizScreen mounted. Questions length:', questions.length);
-    const [currentIndex, setCurrentIndex] = useState(questions.length > 0 ? Math.min(30, questions.length - 1) : 0);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [responses, setResponses] = useState<UserResponse[]>([]);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
