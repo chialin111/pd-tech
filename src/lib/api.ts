@@ -69,7 +69,7 @@ export const submitQuiz = async (name: string, responses: UserResponse[]): Promi
 // --- Mock Data ---
 
 const mockQuestions = (): Question[] => {
-    return [
+    const questions: Question[] = [
         {
             id: '1',
             text: '進行腹膜透析換液操作前，下列哪項準備工作最重要？',
@@ -96,6 +96,25 @@ const mockQuestions = (): Question[] => {
             options: { A: '加快流速', B: '調整姿勢或減慢流速', C: '立即停止並拔管', D: '服用止痛藥', E: '大叫求救' }
         }
     ];
+
+    for (let i = 6; i <= 31; i++) {
+        questions.push({
+            id: i.toString(),
+            text: i === 31
+                ? '第 31 題：這是一個測試題目，用於驗證長文本和圖片的顯示效果。如果腹膜透析患者在操作過程中發現引流液顏色異常（如血色或混濁），且伴隨發燒或腹痛，下列哪項處置最為恰當？'
+                : `這是第 ${i} 題的測試題目。`,
+            imgUrl: i === 31 ? 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60' : undefined,
+            options: {
+                A: `選項 A (${i})`,
+                B: `選項 B (${i})`,
+                C: `選項 C (${i})`,
+                D: `選項 D (${i})`,
+                E: `選項 E (${i})`
+            }
+        });
+    }
+
+    return questions;
 };
 
 const mockSubmit = (_name: string, responses: UserResponse[]): Promise<QuizResult> => {
@@ -107,8 +126,8 @@ const mockSubmit = (_name: string, responses: UserResponse[]): Promise<QuizResul
             }, 0);
 
             const result: QuizResult = {
-                score: calculatedScore, // Use calculated score instead of hardcoded 80
-                totalQuestions: 5,
+                score: calculatedScore,
+                totalQuestions: responses.length,
                 details: responses.map(r => ({
                     questionId: r.questionId,
                     questionText: `Question ${r.questionId}`,

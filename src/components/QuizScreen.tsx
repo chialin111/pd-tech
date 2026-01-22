@@ -9,7 +9,8 @@ interface QuizScreenProps {
 }
 
 export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isSubmitting }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+    console.log('QuizScreen mounted. Questions length:', questions.length);
+    const [currentIndex, setCurrentIndex] = useState(questions.length > 0 ? Math.min(30, questions.length - 1) : 0);
     const [responses, setResponses] = useState<UserResponse[]>([]);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
@@ -17,6 +18,7 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
 
     // Default placeholder if no image provided
     const bgImage = currentQuestion.imgUrl || 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80';
+    const hasCustomImage = !!currentQuestion.imgUrl;
 
     const handleOptionSelect = (key: string) => {
         setSelectedOption(key);
@@ -72,14 +74,47 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
                 <div
                     className="quiz-image"
                     style={{
-                        backgroundImage: `url(${bgImage})`
+                        height: hasCustomImage ? '45vh' : '200px', // Default height for placeholder
+                        minHeight: hasCustomImage ? '350px' : undefined,
+                        backgroundColor: hasCustomImage ? '#000' : undefined,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        overflow: 'hidden'
                     }}
                 >
-                    <div style={{
-                        position: 'absolute',
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)'
-                    }} />
+                    {hasCustomImage ? (
+                        <img
+                            src={bgImage}
+                            alt="Question context"
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain'
+                            }}
+                        />
+                    ) : (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                backgroundImage: `url(${bgImage})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center'
+                            }}
+                        >
+                            <div style={{
+                                position: 'absolute',
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%)'
+                            }} />
+                        </div>
+                    )}
+
                     <div style={{
                         position: 'absolute',
                         bottom: '1rem',
@@ -87,7 +122,11 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
                         color: 'white',
                         fontWeight: 'bold',
                         fontSize: '1.2rem',
-                        textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                        background: hasCustomImage ? 'rgba(0,0,0,0.5)' : undefined,
+                        padding: hasCustomImage ? '0.25rem 0.75rem' : undefined,
+                        borderRadius: hasCustomImage ? '4px' : undefined,
+                        zIndex: 10
                     }}>
                         Question {currentIndex + 1} / {questions.length}
                     </div>
