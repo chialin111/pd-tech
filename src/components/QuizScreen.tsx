@@ -74,7 +74,7 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
                 <div
                     className="quiz-image"
                     style={{
-                        height: hasCustomImage ? '45vh' : '200px', // Default height for placeholder
+                        height: hasCustomImage ? '60vh' : '200px', // Default height for placeholder
                         minHeight: hasCustomImage ? '350px' : undefined,
                         backgroundColor: hasCustomImage ? '#000' : undefined,
                         display: 'flex',
@@ -89,8 +89,8 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
                             src={bgImage}
                             alt="Question context"
                             style={{
-                                maxWidth: '100%',
-                                maxHeight: '100%',
+                                width: '100%',
+                                height: '100%',
                                 objectFit: 'contain'
                             }}
                         />
