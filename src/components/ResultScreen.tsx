@@ -73,12 +73,12 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ result, onRetake, us
                         </div>
 
                         <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#555' }}>
+                            <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', color: '#555', whiteSpace: 'pre-wrap' }}>
                                 Q{index + 1}: {detail.questionText}
                             </div>
 
                             {/* Only show Question ID, Text, and Explanation */}
-                            <div style={{ marginTop: '0.5rem', fontSize: '0.95rem', color: '#444', lineHeight: '1.5', background: '#f8f9fa', padding: '0.8rem', borderRadius: '4px' }}>
+                            <div style={{ marginTop: '0.5rem', fontSize: '0.95rem', color: '#444', lineHeight: '1.5', background: '#f8f9fa', padding: '0.8rem', borderRadius: '4px', whiteSpace: 'pre-wrap' }}>
                                 <strong>解答/觀念解析：</strong>
                                 <br />
                                 {detail.explanation || '暫無解析'}
