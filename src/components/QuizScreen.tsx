@@ -147,7 +147,10 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                         {currentQuestion.options && (Object.keys(currentQuestion.options) as Array<keyof typeof currentQuestion.options>)
-                            .filter(key => currentQuestion.options[key] && currentQuestion.options[key].trim() !== '')
+                            .filter(key => {
+                                const val = currentQuestion.options[key];
+                                return val !== null && val !== undefined && String(val).trim() !== '';
+                            })
                             .map((key) => {
                             const isSelected = selectedOption === key;
                             return (
@@ -183,7 +186,7 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({ questions, onSubmit, isS
                                     }}>
                                         {key}
                                     </div>
-                                    <span style={{ flex: 1, whiteSpace: 'pre-wrap' }}>{currentQuestion.options[key]}</span>
+                                    <span style={{ flex: 1, whiteSpace: 'pre-wrap' }}>{String(currentQuestion.options[key])}</span>
                                     {isSelected && <CheckCircle2 size={20} />}
                                 </button>
                             );
