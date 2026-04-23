@@ -120,8 +120,8 @@ const mockQuestions = (wrongIds: string[] = []): Question[] => {
         });
     }
 
-    let priorityRows = [];
-    let otherRows = [];
+    let priorityRows: Question[] = [];
+    let otherRows: Question[] = [];
 
     questions.forEach(q => {
         if (wrongIds.includes(q.id)) {
@@ -134,7 +134,7 @@ const mockQuestions = (wrongIds: string[] = []): Question[] => {
     priorityRows.sort(() => 0.5 - Math.random());
     otherRows.sort(() => 0.5 - Math.random());
 
-    let selectedRows = [];
+    let selectedRows: Question[] = [];
     if (priorityRows.length >= 5) {
         selectedRows = priorityRows.slice(0, 5);
     } else {
