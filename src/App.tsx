@@ -19,7 +19,7 @@ function App() {
     setUserName(name);
     setScreen('loading');
     try {
-      const data = await fetchQuestions();
+      const data = await fetchQuestions(name);
       setQuestions(data);
       setScreen('quiz');
     } catch (err) {
@@ -33,6 +33,17 @@ function App() {
     setScreen('submitting');
     try {
       const resultData = await submitQuiz(userName, responses);
+      
+      // Save wrong question IDs to localStorage
+      const wrongIds = resultData.details
+        .filter(d => !d.isCorrect)
+        .map(d => d.questionId);
+      try {
+        localStorage.setItem(`wrongIds_${userName}`, JSON.stringify(wrongIds));
+      } catch (e) {
+        console.error('Failed to save wrongIds', e);
+      }
+
       setResult(resultData);
       setScreen('result');
     } catch (err) {

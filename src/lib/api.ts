@@ -9,18 +9,24 @@ class ApiError extends Error {
     }
 }
 
-export const fetchQuestions = async (): Promise<Question[]> => {
-    // In a real scenario, we would fetch from the Google Apps Script URL.
-    // For development without a real backend, we might want to mock this or
-    // actually try to fetch if the URL was provided (it's currently a placeholder).
+export const fetchQuestions = async (userName?: string): Promise<Question[]> => {
+    let wrongIds: string[] = [];
+    if (userName) {
+        try {
+            wrongIds = JSON.parse(localStorage.getItem(`wrongIds_${userName}`) || '[]');
+        } catch (e) {
+            console.error('Failed to parse wrongIds', e);
+        }
+    }
 
     if (!GAS_URL || GAS_URL.includes('YOUR_SCRIPT_ID')) {
         console.warn('Google Apps Script URL is not set. Returning mock data.');
-        return mockQuestions();
+        return mockQuestions(wrongIds);
     }
 
     try {
-        const response = await fetch(`${GAS_URL}?action=getQuestions`);
+        const wrongIdsParam = wrongIds.length > 0 ? `&wrongIds=${wrongIds.join(',')}` : '';
+        const response = await fetch(`${GAS_URL}?action=getQuestions${wrongIdsParam}`);
         if (!response.ok) {
             throw new ApiError(`Failed to fetch questions: ${response.statusText}`);
         }
@@ -30,7 +36,7 @@ export const fetchQuestions = async (): Promise<Question[]> => {
         console.error('API Error:', error);
         // Fallback to mock data if API fails in dev, or rethrow in prod
         // For now, let's return mock data so the UI works
-        return mockQuestions();
+        return mockQuestions(wrongIds);
     }
 };
 
@@ -68,7 +74,7 @@ export const submitQuiz = async (name: string, responses: UserResponse[]): Promi
 
 // --- Mock Data ---
 
-const mockQuestions = (): Question[] => {
+const mockQuestions = (wrongIds: string[] = []): Question[] => {
     const questions: Question[] = [
         {
             id: '1',
@@ -114,8 +120,28 @@ const mockQuestions = (): Question[] => {
         });
     }
 
-    // Randomly select 5 questions
-    return questions.sort(() => 0.5 - Math.random()).slice(0, 5);
+    let priorityRows = [];
+    let otherRows = [];
+
+    questions.forEach(q => {
+        if (wrongIds.includes(q.id)) {
+            priorityRows.push(q);
+        } else {
+            otherRows.push(q);
+        }
+    });
+
+    priorityRows.sort(() => 0.5 - Math.random());
+    otherRows.sort(() => 0.5 - Math.random());
+
+    let selectedRows = [];
+    if (priorityRows.length >= 5) {
+        selectedRows = priorityRows.slice(0, 5);
+    } else {
+        selectedRows = priorityRows.concat(otherRows.slice(0, 5 - priorityRows.length));
+    }
+
+    return selectedRows.sort(() => 0.5 - Math.random());
 };
 
 const mockSubmit = (_name: string, responses: UserResponse[]): Promise<QuizResult> => {

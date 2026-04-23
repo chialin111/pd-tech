@@ -11,7 +11,8 @@ function doGet(e) {
     const action = e.parameter.action;
 
     if (action === 'getQuestions') {
-        return getQuestions();
+        const wrongIds = e.parameter.wrongIds ? e.parameter.wrongIds.split(',') : [];
+        return getQuestions(wrongIds);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ error: 'Invalid action' }))
@@ -35,42 +36,52 @@ function doPost(e) {
     }
 }
 
-function getQuestions() {
+function getQuestions(wrongIds) {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(QUESTION_SHEET_NAME);
     // Assuming headers: ID, Question, A, B, C, D, E, Answer, ImgUrl(Optional)
     // Rows start from 2
     const data = sheet.getDataRange().getValues();
-    const headers = data[0];
     const rows = data.slice(1);
 
-    // Pick 5 random
-    const questions = [];
-    const count = Math.min(5, rows.length); // Use 5 or all if less than 5
+    let priorityRows = [];
+    let otherRows = [];
 
-    // Scramble indices
-    const indices = rows.map((_, i) => i);
-    for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
+    rows.forEach(row => {
+        const id = row[0].toString();
+        if (wrongIds && wrongIds.includes(id)) {
+            priorityRows.push(row);
+        } else {
+            otherRows.push(row);
+        }
+    });
+
+    // Shuffle both arrays
+    priorityRows.sort(() => 0.5 - Math.random());
+    otherRows.sort(() => 0.5 - Math.random());
+
+    let selectedRows = [];
+    if (priorityRows.length >= 5) {
+        selectedRows = priorityRows.slice(0, 5);
+    } else {
+        selectedRows = priorityRows;
+        selectedRows = selectedRows.concat(otherRows.slice(0, 5 - selectedRows.length));
     }
 
-    for (let i = 0; i < count; i++) {
-        const row = rows[indices[i]];
-        // Map based on column validation (modify indices based on actual sheet layout)
-        // Assuming: 0:ID, 1:Text, 2:A, 3:B, 4:C, 5:D, 6:E, 7:Answer, 8:ImgUrl
-        questions.push({
-            id: row[0].toString(),
-            text: row[1],
-            options: {
-                A: row[2],
-                B: row[3],
-                C: row[4],
-                D: row[5],
-                E: row[6]
-            },
-            imgUrl: row[8] || '' // Optional image URL
-        });
-    }
+    // Shuffle the final 5 questions so priority ones aren't always first
+    selectedRows.sort(() => 0.5 - Math.random());
+
+    const questions = selectedRows.map(row => ({
+        id: row[0].toString(),
+        text: row[1],
+        options: {
+            A: row[2],
+            B: row[3],
+            C: row[4],
+            D: row[5],
+            E: row[6]
+        },
+        imgUrl: row[8] || '' // Optional image URL
+    }));
 
     return ContentService.createTextOutput(JSON.stringify(questions))
         .setMimeType(ContentService.MimeType.JSON);
